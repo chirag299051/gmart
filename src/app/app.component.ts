@@ -1,4 +1,8 @@
 import { Component } from '@angular/core';
+import { AuthService } from 'shared/services/auth.service';
+import { Router } from '@angular/router';
+import { UserService } from 'shared/services/user.service';
+
 
 @Component({
   selector: 'app-root',
@@ -6,5 +10,18 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'gmart';
+  
+  constructor(private auth: AuthService, private router: Router, private user: UserService) {
+    this.auth.user$.subscribe(user => {
+      if(!user) return;
+
+      this.user.save(user);
+
+      let returnUrl = localStorage.getItem('returnUrl');
+      if(!returnUrl) return;  
+      
+      localStorage.removeItem('returnUrl');
+      this.router.navigateByUrl(returnUrl);  
+    });
+  }
 }
